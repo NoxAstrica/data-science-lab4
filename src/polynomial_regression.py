@@ -7,15 +7,6 @@ import matplotlib.pyplot as plt
 
 
 def read_csv(file_path: str) -> pd.DataFrame:
-    """
-    Reads a CSV file and returns its content as a pandas DataFrame.
-
-    Parameters:
-    file_path (str): Path to the CSV file.
-
-    Returns:
-    pd.DataFrame: Loaded data.
-    """
     data = pd.read_csv(file_path)
     if data.empty:
         raise ValueError("The CSV file is empty.")
@@ -23,48 +14,30 @@ def read_csv(file_path: str) -> pd.DataFrame:
 
 
 def train_polynomial_regression(X: np.array, y: np.array, degree: int):
-    """
-    Trains a polynomial regression model.
+    if X.ndim == 1:
+        X = X.reshape(-1, 1)
 
-    Parameters:
-    X (np.array): Independent variable (e.g., house sizes).
-    y (np.array): Dependent variable (e.g., house prices).
-    degree (int): Degree of the polynomial.
+    poly = PolynomialFeatures(degree=degree)
+    X_poly = poly.fit_transform(X)
 
-    Returns:
-    tuple: Trained model and polynomial feature transformer.
-    """
+    model = LinearRegression()
+    model.fit(X_poly, y)
 
     return model, poly
 
 
 def predict_prices(model: LinearRegression, poly: PolynomialFeatures, X: np.array):
-    """
-    Predicts prices using the trained polynomial regression model.
+    if X.ndim == 1:
+        X = X.reshape(-1, 1)
 
-    Parameters:
-    model (LinearRegression): Trained polynomial regression model.
-    poly (PolynomialFeatures): Polynomial feature transformer.
-    X (np.array): Independent variable for prediction.
-
-    Returns:
-    np.array: Predicted prices.
-    """
-
+    X_poly = poly.transform(X)
     return model.predict(X_poly)
 
 
 def evaluate_model(y_true: np.array, y_pred: np.array):
-    """
-    Evaluates the model using various metrics.
-
-    Parameters:
-    y_true (np.array): Actual prices.
-    y_pred (np.array): Predicted prices.
-
-    Returns:
-    dict: Evaluation metrics.
-    """
+    mae = mean_absolute_error(y_true, y_pred)
+    mse = mean_squared_error(y_true, y_pred)
+    rmse = np.sqrt(mse)
 
     return {"MAE": mae, "MSE": mse, "RMSE": rmse}
 

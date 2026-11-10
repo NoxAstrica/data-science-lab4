@@ -5,6 +5,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 
+import matplotlib
+matplotlib.use('Agg')
 
 def read_csv(file_path: str) -> pd.DataFrame:
     """
@@ -21,7 +23,13 @@ def visualize_data(data: pd.DataFrame, x_column: str, y_column: str):
     """
     Visualizes the relationship between the feature and the target variable.
     """
-
+    plt.figure(figsize=(8, 6))
+    plt.scatter(data[x_column], data[y_column], color='blue', label='Data points')
+    plt.xlabel(x_column)
+    plt.ylabel(y_column)
+    plt.title(f'{y_column} vs {x_column}')
+    plt.legend()
+    plt.grid(True, linestyle='--', alpha=0.6)
     plt.show()
 
 
@@ -30,19 +38,23 @@ def linear_regression_with_metrics(data: pd.DataFrame, x_column: str, y_column: 
     Performs linear regression, evaluates metrics, and visualizes the regression line.
     """
     # Prepare the data
+    X = data[[x_column]]  # Features must be 2D
+    y = data[y_column]    # Target variable
 
-
-    # Split the data
-
+    # Split the data (using a test split; note that very small datasets like the example may require adjustment)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
     # Train the model
-
+    model = LinearRegression()
+    model.fit(X_train, y_train)
 
     # Make predictions
-
+    y_pred = model.predict(X_test)
 
     # Evaluate the model
-
+    mae = mean_absolute_error(y_test, y_pred)
+    mse = mean_squared_error(y_test, y_pred)
+    rmse = np.sqrt(mse)
 
     print(f"Model Evaluation Metrics:")
     print(f"Mean Absolute Error (MAE): {mae:.2f}")
@@ -50,14 +62,15 @@ def linear_regression_with_metrics(data: pd.DataFrame, x_column: str, y_column: 
     print(f"Root Mean Squared Error (RMSE): {rmse:.2f}")
 
     # Visualize the regression line
+    plt.figure(figsize=(8, 6))
     plt.scatter(X_test, y_test, color='blue', label='Actual data')
     plt.plot(X_test, y_pred, color='red', linewidth=2, label='Regression line')
     plt.xlabel(x_column)
     plt.ylabel(y_column)
     plt.title('Linear Regression Fit')
     plt.legend()
+    plt.grid(True, linestyle='--', alpha=0.6)
     plt.show()
-
 
 if __name__ == "__main__":
     # Example usage
